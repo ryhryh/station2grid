@@ -1,0 +1,7 @@
+*.csv
+*.nc
+*.npy
+*.hdf5
+*.xls
+*.doc
+*.od*
