@@ -1,54 +1,46 @@
-from models.networks import AE, FCNN
-from tools.data_generator import DataGenerator
-import pandas as pd
+from models import base_model, grid2code_model, station2code_model 
+from tools import datasets, options
 import os
-from glob import glob
-import numpy as np
 home=os.path.expanduser("~")
 
-class Station2GridSD():
+
+class ModelS2GSD(base_model.ModelBase):
     def __init__(self, opt):
         self.opt = opt
-        self.ae = AE(opt)
-        self.fcnn = FCNN(opt)
-        self.dataGenerator = DataGenerator(opt)
+        self.setup()    
         
-        self.n_val_stations = len(self.opt.val_stations.split('_')) ###
-        self.n_features = len(self.opt.features.split('_')) ###
-        self.setup_weight_dir()
-    
+    def setup(self):
+        self.data = datasets.DataS2G(self.opt)
+        self.set_group()
+        
+        optionS2C = options.OptionS2C(domain=self.opt.domain, 
+                                      k=self.opt.k, 
+                                      weightKNN=self.opt.weightKNN, 
+                                      features=self.opt.features, 
+                                      val_stations=self.opt.val_stations, 
+                                      ae_type=self.opt.ae_type, 
+                                      dnn_type=self.opt.dnn_type)   
+        
+        modelS2C = station2code_model.ModelS2C(optionS2C)###
+        self.s2c_model = modelS2C.dnn.get_dnn(modelS2C.weight_path)
+        
+        optionG2C = options.OptionG2C(domain=self.opt.domain, 
+                                      k=self.opt.k, 
+                                      weightKNN=self.opt.weightKNN, 
+                                      ae_type=self.opt.ae_type, )  
+        modelG2C = grid2code_model.ModelG2C(optionG2C)###
+        self.c2g_model = modelG2C.autoencoder.get_decoder(modelG2C.weight_path)
+        
     def test(self): 
-        print('testing...')
-        dataGenerator = self.dataGenerator
+        print('testing')
+        self.data.setup_test()
+        self.stations = self.data.x_norm_select
         
-        g2c_weights = sorted(glob(os.path.join(self.g2c_weight_dir, '*hdf5')))
-        g2c_weight = g2c_weights[-1]
-        s2c_weights = sorted(glob(os.path.join(self.s2c_weight_dir, '*hdf5')))
-        s2c_weight = s2c_weights[-1]
-
-        c2g_model = self.ae.get_decoder(g2c_weight)
-        s2c_model = self.fcnn.get_fcnn(s2c_weight)
+        codes = self.s2c_model.predict(self.stations)
+        codes = codes.reshape(-1, 44, 26, 4)
         
-        self.stations = dataGenerator.station_path2arr(self.opt.epa_station_path)
+        grids_norm = self.c2g_model.predict(codes)
+        grids_denorm = self.data.denormalize(grids_norm)
         
-        codes=s2c_model.predict(self.stations)
-        codes=codes.reshape(-1, 44, 26, 4)
-        
-        grids=c2g_model.predict(codes)
-        grids=dataGenerator.denormalize(grids)
-        print('finish!')
-        return grids
-    
-    def save_history(self, history):
-        df_history = pd.DataFrame(history.history)
-        path = os.path.join(self.weight_dir, 'history.csv',)
-        df_history.to_csv(path, index=False)
-        
-    def setup_weight_dir(self):
-        opt = self.opt
-        source = 'domain_%s-k_%s-weightKNN_%s'%(opt.domain, opt.k, opt.weightKNN)
-        base_dir = os.path.join(home, 'station2grid', 'weights', 'single', source)
-        self.g2c_weight_dir = os.path.join(base_dir, 'grid2code', opt.ae_type)
-        self.s2c_weight_dir = os.path.join(base_dir, 'station2code', opt.ae_type, str(self.n_val_stations), opt.val_stations, opt.features)
-        
-        
+        print('finish')
+        return grids_denorm

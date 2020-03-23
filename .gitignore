@@ -1,7 +1,8 @@
 *.csv
-*.nc
+*.nc*
 *.npy
 *.hdf5
 *.xls
 *.doc
 *.od*
+*.png
