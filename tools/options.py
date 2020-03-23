@@ -2,20 +2,65 @@ import os
 import argparse
 home=os.path.expanduser("~")
 
-class Opt():
-    def __init__(self, domain='air', k=5, weightKNN='distance', ae_type='A1', batch_size=2, n_epochs=10, model_name='grid2code', features='pm25', val_stations='Shilin_Guting', code_length=4576, epa_station_path=''):
+##########################################################################################  
+########################################################################################## 
+class OptionG2C():
+    def __init__(self, model_name='grid2code', domain='air', k=5, weightKNN='distance', 
+                 batch_size=10, epochs=5, ae_type='code_length-4576'):
+        self.model_name = model_name
+        self.domain = domain
+        self.k = k
+        self.weightKNN = weightKNN
+        self.batch_size = batch_size
+        self.epochs = epochs
+        self.ae_type = ae_type
+        
+class OptionS2C():
+    def __init__(self, model_name='station2code', features='pm25', val_stations='Chaozhou', 
+                domain='air', k=5, weightKNN='distance', batch_size=10, epochs=5, 
+                ae_type='code_length-4576', dnn_type='embedding-0~bn-1'):
+        self.model_name = model_name
+        self.features = features
+        self.val_stations = val_stations
+        self.domain = domain
+        self.k = k
+        self.weightKNN = weightKNN
+        self.batch_size = batch_size
+        self.epochs = epochs
+        self.ae_type = ae_type
+        self.dnn_type = dnn_type
+        
+        
+class OptionS2GSD():
+    def __init__(self, model_name='station2gridSD', features='pm25', val_stations='Chaozhou', 
+                 domain='air', k=5, weightKNN='distance', 
+                 ae_type='code_length-4576', dnn_type='embedding-0~bn-1'):
+        self.model_name = model_name
+        self.features = features
+        self.val_stations = val_stations
         self.domain = domain
         self.k = k
         self.weightKNN = weightKNN
         self.ae_type = ae_type
-        self.batch_size = batch_size
-        self.n_epochs = n_epochs
+        self.dnn_type = dnn_type
+            
+class OptionS2GMD():
+    def __init__(self, model_name='station2gridMD', features='pm25', val_stations='Chaozhou', 
+                 batch_size=10, epochs=5, ae_type='code_length-4576', dnn_type='embedding-0~bn-1',
+                 domains='air_3_distance~sat_3_distance', composite_type='composite-conv~filter-8x8'):
         self.model_name = model_name
         self.features = features
         self.val_stations = val_stations
-        self.code_length = code_length
-        self.epa_station_path = epa_station_path
-              
+        self.batch_size = batch_size
+        self.epochs = epochs
+        self.ae_type = ae_type
+        self.dnn_type = dnn_type
+        self.domains = domains
+        self.composite_type = composite_type
+
+'''     
+##########################################################################################  
+########################################################################################## 
 class BaseOptions():
     def __init__(self,fileName):
         self.fileName=fileName
@@ -52,4 +97,4 @@ class BaseOptions():
             parser.add_argument('--features', type=str, default='pm25_pm10')
             parser.add_argument('--valStations', type=str, default='Tamsui_Shilin')
         
-       
+       '''
