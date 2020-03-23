@@ -4,18 +4,20 @@ import numpy as np
 import netCDF4
 
 def get_one_month(year,month):
-    print(year,month)
-    path=os.path.join(os.path.expanduser("~"),'station2grid','datasets','rawdata','sat','%s_%s.nc'%(year,month))
+    print(year,month) ###
+    path=os.path.join(os.path.expanduser("~"),'station2grid','datasets','rawdata','sat','%s_%s.nc2'%(year,month)) ######
     dataset = netCDF4.Dataset(path)
     lat_arr=np.array(dataset.variables['latitude'][:]) 
     lon_arr=np.array(dataset.variables['longitude'][:]) 
     pm25_arr=np.array(dataset.variables['pm2p5'][:]) 
+    pm10_arr=np.array(dataset.variables['pm10'][:]) 
+    t2m_arr=np.array(dataset.variables['t2m'][:]) 
     time_var = dataset.variables['time']
     time_arr = netCDF4.num2date(time_var[:],time_var.units)
     time_arr = np.array([pd.to_datetime(t+pd.Timedelta(hours=8)) for t in time_arr]) 
     
     one_month=pd.DataFrame()
-    for i_dt,dt in enumerate(time_arr[:10]): ######
+    for i_dt,dt in enumerate(time_arr[:]): ############################################################
         for i_lat,lat in enumerate(lat_arr):
             for i_lon,lon in enumerate(lon_arr):
                 row=pd.DataFrame()
@@ -23,6 +25,8 @@ def get_one_month(year,month):
                 row['lat']=[round(float(lat),3)]
                 row['lon']=[round(float(lon),3)]
                 row['pm25']=[round(pm25_arr[i_dt,i_lat,i_lon]*10**9,3)]
+                row['pm10']=[round(pm10_arr[i_dt,i_lat,i_lon]*10**9,3)]
+                row['temperature']=[round(t2m_arr[i_dt,i_lat,i_lon]-273,3)]
                 one_month=one_month.append(row)
     
     # include [11,14,17] exclude others
@@ -34,7 +38,7 @@ def get_one_month(year,month):
 if __name__=='__main__':
     print('processing satellite...')
     ##########################################################################################
-    dfs=[get_one_month(year,month) for year in range(2015,2018+1)[:] for month in range(1,12+1)[:1]]
+    dfs=[get_one_month(year,month) for year in range(2015,2018+1)[:] for month in range(1,12+1)[:]] ###
     df=pd.concat(dfs,axis=0)
                    
     csv_path=os.path.join(os.path.expanduser("~"),'station2grid','datasets','csv','sat.csv')
