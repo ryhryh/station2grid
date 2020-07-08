@@ -15,6 +15,7 @@ from tools import options, CommonObj
 home = os.path.expanduser("~")
 info = CommonObj().epa_station_info
 n_all_stations = len(info)
+
 #########################################################################################################
 #########################################################################################################
 class DNN():
@@ -36,7 +37,7 @@ class DNN():
         
         input_ = Input(shape=(num_station, self.n_features))
          
-        if self.opt.dnn_type == 'a1': 
+        if self.opt.dnn_type == 'a1':
             x = Flatten()(input_)
             x = Dense(300, activation='relu')(x) 
             
@@ -44,7 +45,7 @@ class DNN():
         
         model = Model(input_, output_)
         model.compile(loss='mean_squared_error', optimizer='adam', metrics=['mae', 'mse'])
-        #model.summary() ###
+        model.summary() ###
         return model
     
     def get_dnn(self, weight):
@@ -58,16 +59,31 @@ class Autoencoder():
         self.opt = opt
         
     def define_autoencoder(self):
+        ae_type = self.opt.ae_type
+        if ae_type == 'code_length-4576':
+            autoencoder = self.code_length_4576()
+        elif ae_type == 'code_length-2288': 
+            autoencoder = self.code_length_2288()
+        elif ae_type == 'code_length-3432':
+            autoencoder = self.code_length_3432()
+        elif ae_type == 'code_length-5720':
+            autoencoder = self.code_length_5720()
+        elif ae_type == 'code_length-6864':
+            autoencoder = self.code_length_6864()    
+        
+        autoencoder.compile(optimizer='adam', loss='binary_crossentropy')
+        autoencoder.summary()
+        return autoencoder
+    
+    def code_length_4576(self,):
         input_shape = (348, 204, 1)
         input_img = Input(shape=input_shape)  
-
         x = Conv2D(16, (3, 3), activation='relu', padding='same')(input_img)
         x = MaxPooling2D((2, 2), padding='same')(x)
         x = Conv2D(8, (3, 3), activation='relu', padding='same')(x)
         x = MaxPooling2D((2, 2), padding='same')(x)
         x = Conv2D(4, (3, 3), activation='relu', padding='same')(x)
         encoded = MaxPooling2D((2, 2), padding='same')(x)
-
         x = Conv2D(4, (3, 3), activation='relu', padding='same')(encoded)
         x = UpSampling2D((2, 2))(x)
         x = Conv2D(8, (3, 3), activation='relu', padding='same')(x)
@@ -75,12 +91,85 @@ class Autoencoder():
         x = Conv2D(16, (3, 3), activation='relu')(x)
         x = UpSampling2D((2, 2))(x)
         decoded = Conv2D(1, (3, 3), activation='sigmoid', padding='same')(x)
-
-        # autoencoder
         autoencoder = Model(input_img, decoded)
-        autoencoder.compile(optimizer='adam', loss='binary_crossentropy')
         return autoencoder
-        
+    
+    def code_length_6864(self,):
+        input_shape = (348, 204, 1)
+        input_img = Input(shape=input_shape)  
+        x = Conv2D(16, (3, 3), activation='relu', padding='same')(input_img)
+        x = MaxPooling2D((2, 2), padding='same')(x)
+        x = Conv2D(8, (3, 3), activation='relu', padding='same')(x)
+        x = MaxPooling2D((2, 2), padding='same')(x)
+        x = Conv2D(6, (3, 3), activation='relu', padding='same')(x)
+        encoded = MaxPooling2D((2, 2), padding='same')(x)
+        x = Conv2D(6, (3, 3), activation='relu', padding='same')(encoded)
+        x = UpSampling2D((2, 2))(x)
+        x = Conv2D(8, (3, 3), activation='relu', padding='same')(x)
+        x = UpSampling2D((2, 2))(x)
+        x = Conv2D(16, (3, 3), activation='relu')(x)
+        x = UpSampling2D((2, 2))(x)
+        decoded = Conv2D(1, (3, 3), activation='sigmoid', padding='same')(x)
+        autoencoder = Model(input_img, decoded)
+        return autoencoder
+    
+    def code_length_5720(self,):
+        input_shape = (348, 204, 1)
+        input_img = Input(shape=input_shape)  
+        x = Conv2D(16, (3, 3), activation='relu', padding='same')(input_img)
+        x = MaxPooling2D((2, 2), padding='same')(x)
+        x = Conv2D(8, (3, 3), activation='relu', padding='same')(x)
+        x = MaxPooling2D((2, 2), padding='same')(x)
+        x = Conv2D(5, (3, 3), activation='relu', padding='same')(x)
+        encoded = MaxPooling2D((2, 2), padding='same')(x)
+        x = Conv2D(5, (3, 3), activation='relu', padding='same')(encoded)
+        x = UpSampling2D((2, 2))(x)
+        x = Conv2D(8, (3, 3), activation='relu', padding='same')(x)
+        x = UpSampling2D((2, 2))(x)
+        x = Conv2D(16, (3, 3), activation='relu')(x)
+        x = UpSampling2D((2, 2))(x)
+        decoded = Conv2D(1, (3, 3), activation='sigmoid', padding='same')(x)
+        autoencoder = Model(input_img, decoded)
+        return autoencoder
+    
+    def code_length_3432(self,):
+        input_shape = (348, 204, 1)
+        input_img = Input(shape=input_shape)  
+        x = Conv2D(16, (3, 3), activation='relu', padding='same')(input_img)
+        x = MaxPooling2D((2, 2), padding='same')(x)
+        x = Conv2D(8, (3, 3), activation='relu', padding='same')(x)
+        x = MaxPooling2D((2, 2), padding='same')(x)
+        x = Conv2D(3, (3, 3), activation='relu', padding='same')(x)
+        encoded = MaxPooling2D((2, 2), padding='same')(x)
+        x = Conv2D(3, (3, 3), activation='relu', padding='same')(encoded)
+        x = UpSampling2D((2, 2))(x)
+        x = Conv2D(8, (3, 3), activation='relu', padding='same')(x)
+        x = UpSampling2D((2, 2))(x)
+        x = Conv2D(16, (3, 3), activation='relu')(x)
+        x = UpSampling2D((2, 2))(x)
+        decoded = Conv2D(1, (3, 3), activation='sigmoid', padding='same')(x)
+        autoencoder = Model(input_img, decoded)
+        return autoencoder
+    
+    def code_length_2288(self,):
+        input_shape = (348, 204, 1)
+        input_img = Input(shape=input_shape)  
+        x = Conv2D(16, (3, 3), activation='relu', padding='same')(input_img)
+        x = MaxPooling2D((2, 2), padding='same')(x)
+        x = Conv2D(8, (3, 3), activation='relu', padding='same')(x)
+        x = MaxPooling2D((2, 2), padding='same')(x)
+        x = Conv2D(2, (3, 3), activation='relu', padding='same')(x)
+        encoded = MaxPooling2D((2, 2), padding='same')(x)
+        x = Conv2D(2, (3, 3), activation='relu', padding='same')(encoded)
+        x = UpSampling2D((2, 2))(x)
+        x = Conv2D(8, (3, 3), activation='relu', padding='same')(x)
+        x = UpSampling2D((2, 2))(x)
+        x = Conv2D(16, (3, 3), activation='relu')(x)
+        x = UpSampling2D((2, 2))(x)
+        decoded = Conv2D(1, (3, 3), activation='sigmoid', padding='same')(x)
+        autoencoder = Model(input_img, decoded)
+        return autoencoder
+    
     def get_encoder(self, weight): 
         autoencoder = load_model(weight)
         encoder = Model(autoencoder.input, autoencoder.layers[6].output)
@@ -89,7 +178,10 @@ class Autoencoder():
     def get_decoder(self, weight): 
         autoencoder = load_model(weight)
         
-        input_decoder = Input(shape=(44, 26, 4))
+        code_channel_length = int(self.opt.ae_type[len('code_length-'):len('code_length-')+1])
+        print('code_channel_length', code_channel_length) ###
+        
+        input_decoder = Input(shape=(44, 26, code_channel_length))
         x = autoencoder.layers[-7](input_decoder) 
         for i in range(6,(2)-1,-1):
             x = autoencoder.layers[-i](x) 

@@ -37,7 +37,10 @@ class ModelS2GSD(base_model.ModelBase):
         self.stations = self.data.x_norm_select
         
         codes = self.s2c_model.predict(self.stations)
-        codes = codes.reshape(-1, 44, 26, 4)
+        
+        code_channel_length = int(self.opt.ae_type[len('code_length-'):len('code_length-')+1])
+        print('code_channel_length',code_channel_length)###
+        codes = codes.reshape(-1, 44, 26, code_channel_length)
         
         grids_norm = self.c2g_model.predict(codes)
         grids_denorm = self.data.denormalize(grids_norm)
