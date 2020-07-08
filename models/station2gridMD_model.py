@@ -27,7 +27,7 @@ class ModelS2GMD(base_model.ModelBase):
         x_valid, y_valid = self.data.x_valid, self.data.y_valid
         
         s2gMD_model = self.compositeNN.define_s2gMD(self.data.lats_lons)
-        s2gMD_model.summary()
+        #s2gMD_model.summary() ###
         
         callbacks = self.get_callbacks(min_delta=0.0001, patience=10) ###
         self.history = s2gMD_model.fit(
