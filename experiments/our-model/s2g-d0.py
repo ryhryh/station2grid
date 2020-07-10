@@ -23,7 +23,7 @@ feature_list = [
 
 info = tools.CommonObj().epa_station_info
 #station_list = info.SiteEngName
-station_list = ['Tainan']
+station_list = ['Guting', 'Xitun', 'Zuoying', 'Hualien']
 
 
 #-----------------------------------------------------------------------------
