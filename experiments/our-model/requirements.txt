@@ -11,7 +11,7 @@ backcall==0.1.0
 basemap==1.0.7
 beautifulsoup4==4.6.3
 biwrap==0.1.6
-bleach==1.5.0
+bleach==3.1.4
 boto==2.49.0
 boto3==1.9.106
 botocore==1.12.106
