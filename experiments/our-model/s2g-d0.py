@@ -17,13 +17,13 @@ os.environ["CUDA_VISIBLE_DEVICES"]='0'
 # iterate over all epa stations
 #-----------------------------------------------------------------------------
 feature_list = [
-    'pm25', 
-    #'pm25_AMBTEMP_RH_RAINFALL_WINDCOS_WINDSIN'
+    #'pm25', 
+    'pm25_AMBTEMP_RH_RAINFALL_WINDCOS_WINDSIN_PM10_NO2_SO2_O3'
 ]
 
 info = tools.CommonObj().epa_station_info
 #station_list = info.SiteEngName
-station_list = ['Guting', 'Xitun', 'Zuoying', 'Hualien']
+station_list = ['Tainan', 'Guting', 'Xitun', 'Zuoying', 'Hualien']
 
 
 #-----------------------------------------------------------------------------
