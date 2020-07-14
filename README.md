@@ -31,8 +31,8 @@ Single-Domain Transfer | Multi-Domains Transfer
 - The SD-MS model reach 2nd best performance in urban areas, and the SD-SAT model 2nd best performance in mountainous areas.
 - The MD model performs best in both urban areas and mountainous areas.
 
-<img src="imgs/city_" width="500">
-<img src="imgs/mountain_" width="500">
+<img src="imgs/city" width="500">
+<img src="imgs/mountain" width="500">
 
 ## Prerequisites
 - Python 3.6
